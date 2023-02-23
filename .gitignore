@@ -1,0 +1,6 @@
+files/data.template/ssl/certs/*
+files/data.template/ssl/private/*
+!files/data.template/ssl/certs/touch
+!files/data.template/ssl/private/touch
+
+svn_admin
