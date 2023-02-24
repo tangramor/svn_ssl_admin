@@ -19,8 +19,6 @@ if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     /usr/bin/cp -f /app/templete/svnserve/* /home/svnadmin/
     /usr/bin/cp -Rf /app/templete/hooks /home/svnadmin/
 
-    mv /app/config /app/config.bak
-    ln -s /home/svnadmin/config /app/config
     touch /home/svnadmin/lock
 fi
 

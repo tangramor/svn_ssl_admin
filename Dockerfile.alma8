@@ -19,7 +19,7 @@ LABEL org.opencontainers.image.authors="tangramor<tangramor@gmail.com>"
 ADD files.alma8 /
 COPY --from=builder /app/SvnAdminV2.0/02.php/ /app/
 COPY --from=builder /app/SvnAdminV2.0/01.web/dist/* /app/
-COPY --from=builder /app/SvnAdminV2.0/03.dockerfile/data/ /home/svnadmin/
+COPY --from=builder /app/SvnAdminV2.0/03.dockerfile/data/ /data.template/
 
 WORKDIR /app
 

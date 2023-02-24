@@ -25,15 +25,15 @@ if [ ! -d "/home/svnadmin/rep" ];then
     mkdir -p /home/svnadmin/logs /home/svnadmin/rep /home/svnadmin/backup /home/svnadmin/templete/initStruct/01/{trunk,tags,branches}
 fi
 
-if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/authz" ]];then
-    cp -Rf /data.template/* /home/svnadmin/
+if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
+    /usr/bin/cp -Rf /data.template/* /home/svnadmin/
     /usr/bin/cp -f /app/templete/database/sqlite/svnadmin.db /home/svnadmin/
     /usr/bin/cp -f /app/templete/svnserve/* /home/svnadmin/
     /usr/bin/cp -Rf /app/templete/hooks /home/svnadmin/
 
-    mv /app/config /app/config.bak
-    ln -s /home/svnadmin/config /app/config
-
+    # mv /app/config /app/config.bak
+    # ln -s /home/svnadmin/config /app/config
+    touch /home/svnadmin/lock
 fi
 
 chmod -R 711 /home/svnadmin/
