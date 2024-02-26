@@ -16,7 +16,7 @@ FROM centos:7
 
 LABEL org.opencontainers.image.authors="tangramor<tangramor@gmail.com>"
 
-ADD files /
+ADD files.centos7 /
 COPY --from=builder /app/SvnAdminV2.0/02.php/ /app/
 COPY --from=builder /app/SvnAdminV2.0/01.web/dist/* /app/
 COPY --from=builder /app/SvnAdminV2.0/03.cicd/svnadmin_docker/data/ /data.template/

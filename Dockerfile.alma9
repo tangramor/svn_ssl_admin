@@ -27,7 +27,7 @@ RUN dnf -y update && dnf install -y epel-release && \
     dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
     dnf -y module reset php && dnf -y module install php:remi-7.4 && \
     dnf install -y subversion httpd httpd-tools mod_ssl mod_dav_svn subversion-tools \
-        procps wget unzip which perl-CPAN perl-Module-Build \
+        cronie at procps wget unzip which perl-CPAN perl-Module-Build \
         perl-Net-SMTP-SSL perl-Pod-Usage net-tools hostname inotify-tools supervisor \
         php php-common php-cli php-fpm php-json php-mysqlnd php-mysqli php-pdo \
         php-process php-json php-gd php-bcmath php-ldap php-mbstring \

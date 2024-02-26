@@ -7,4 +7,4 @@ docker run -d -it \
     -v /etc/localtime:/etc/localtime \
     -v ${PWD}/svnadmin:/home/svnadmin \
     --name svn \
-    tangramor/svn_ssl_admin
+    tangramor/svn_ssl_admin:centos7
