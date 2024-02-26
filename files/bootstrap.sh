@@ -22,15 +22,13 @@ SUPERVISOR_PARAMS='-c /etc/supervisord.conf'
 # Create directories for supervisor's UNIX socket and logs (which might be missing
 # as container might start with /data mounted from another data-container).
 if [ ! -d "/home/svnadmin/rep" ];then
-    mkdir -p /home/svnadmin/logs /home/svnadmin/rep /home/svnadmin/backup /home/svnadmin/templete/initStruct/01/{trunk,tags,branches}
+    mkdir -p /home/svnadmin/{crond,logs,rep,backup} /home/svnadmin/templete/initStruct/01/{trunk,tags,branches} /run/php-fpm
 fi
 
 if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     /usr/bin/cp -Rf /data.template/* /home/svnadmin/
-    /usr/bin/cp -f /app/templete/database/sqlite/svnadmin.db /home/svnadmin/
-    /usr/bin/cp -f /app/templete/svnserve/* /home/svnadmin/
-    /usr/bin/cp -Rf /app/templete/hooks /home/svnadmin/
-
+    /usr/bin/cp -f /data.template/config/bin.php /app/config/bin.php
+    
     # mv /app/config /app/config.bak
     # ln -s /home/svnadmin/config /app/config
     touch /home/svnadmin/lock
