@@ -1,0 +1,45 @@
+FROM node:alpine as builder
+
+WORKDIR /app
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk add git && \
+    npm config set registry https://registry.npmmirror.com/ && \
+    git clone https://gitee.com/witersen/SvnAdminV2.0.git && \
+    sed -i 's/chmod 777/chmod 755/g' `grep 'chmod 777' -rl /app/SvnAdminV2.0/*` && \
+    cd SvnAdminV2.0/01.web/ && \
+    npm update && \
+    npm run build && \
+    ls -l
+
+FROM almalinux:9
+
+LABEL org.opencontainers.image.authors="tangramor<tangramor@gmail.com>"
+
+ADD files.alma9 /
+COPY --from=builder /app/SvnAdminV2.0/02.php/ /app/
+COPY --from=builder /app/SvnAdminV2.0/01.web/dist/* /app/
+COPY --from=builder /app/SvnAdminV2.0/03.cicd/svnadmin_docker/data/ /data.template/
+
+WORKDIR /app
+
+RUN dnf -y update && dnf install -y epel-release && \
+    dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
+    dnf -y module reset php && dnf -y module install php:remi-7.4 && \
+    dnf install -y subversion httpd httpd-tools mod_ssl mod_dav_svn subversion-tools \
+        procps wget unzip which perl-CPAN perl-Module-Build \
+        perl-Net-SMTP-SSL perl-Pod-Usage net-tools hostname inotify-tools supervisor \
+        php php-common php-cli php-fpm php-json php-mysqlnd php-mysqli php-pdo \
+        php-process php-json php-gd php-bcmath php-ldap php-mbstring \
+        cyrus-sasl cyrus-sasl-lib cyrus-sasl-plain && \
+    rm -rf /var/www/html && \
+    ln -s /app /var/www/html && \
+    mkdir -p /run/php-fpm && \
+    mkdir -p /usr/bin/svn-tools && \
+    ln -s /usr/bin/svnauthz /usr/bin/svn-tools/svnauthz-validate && \
+    chown -R apache:apache /app && \
+    chmod +x /bootstrap.sh
+    # cpan -i SVN::Notify && \
+    # cpan -i Net::SMTP::TLS
+
+ENTRYPOINT ["/bootstrap.sh"]
