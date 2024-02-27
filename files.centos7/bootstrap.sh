@@ -28,11 +28,15 @@ fi
 if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     /usr/bin/cp -Rf /data.template/* /home/svnadmin/
     /usr/bin/cp -f /data.template/config/bin.php /app/config/bin.php
-    
-    # mv /app/config /app/config.bak
-    # ln -s /home/svnadmin/config /app/config
+
     touch /home/svnadmin/lock
 fi
+
+# Start saslauthd for LDAP authentication
+spid=$(uuidgen)
+/usr/sbin/saslauthd -a 'ldap' -O "$spid" -O '/home/svnadmin/sasl/ldap/saslauthd.conf'
+ps aux | grep -v grep | grep "$spid" | awk 'NR==1' | awk '{print $2}' > '/home/svnadmin/sasl/saslauthd.pid'
+chmod 777 /home/svnadmin/sasl/saslauthd.pid
 
 chmod -R 711 /home/svnadmin/
 chown -R apache:apache /home/svnadmin

@@ -19,6 +19,13 @@ if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     touch /home/svnadmin/lock
 fi
 
+# Start saslauthd for LDAP authentication
+sed -i "s/SOCKETDIR=\/run\/saslauthd/SOCKETDIR=\/home\/svnadmin\/sasl\/ldap/" /etc/sysconfig/saslauthd
+spid=$(uuidgen)
+/usr/sbin/saslauthd -a 'ldap' -O "$spid" -O '/home/svnadmin/sasl/ldap/saslauthd.conf'
+ps aux | grep -v grep | grep "$spid" | awk 'NR==1' | awk '{print $2}' > '/home/svnadmin/sasl/saslauthd.pid'
+chmod 777 /home/svnadmin/sasl/saslauthd.pid
+
 chmod -R 711 /home/svnadmin/
 chown -R apache:apache /home/svnadmin
 
