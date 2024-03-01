@@ -5,8 +5,7 @@ WORKDIR /app
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk add git && \
     npm config set registry https://registry.npmmirror.com/ && \
-    git clone https://gitee.com/witersen/SvnAdminV2.0.git && \
-    sed -i 's/chmod 777/chmod 755/g' `grep 'chmod 777' -rl /app/SvnAdminV2.0/*` && \
+    git clone https://github.com/tangramor/SvnAdminV2.0.git && \
     cd SvnAdminV2.0/01.web/ && \
     npm update && \
     npm run build && \
@@ -28,24 +27,22 @@ RUN localedef -c -i en_US -f UTF-8 C.UTF-8 && \
     echo 'LC_ALL="C.UTF-8"' >> /etc/sysconfig/i18n && \
     echo 'export LANG="C.UTF-8"' >> /etc/profile && \
     echo 'export LC_ALL="C.UTF-8"' >> /etc/profile && \
-    yum install -y centos-release-scl epel-release yum-utils && \
+    echo -e "[WandiscoSVN]\nname=Wandisco SVN Repo\nbaseurl=http://opensource.wandisco.com/centos/7/svn-1.14/RPMS/x86_64/\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/wandisco-svn.repo &&\
+    yum install -y epel-release yum-utils && \
     rpm -Uvh https://mirrors.aliyun.com/remi/enterprise/remi-release-7.rpm && \
     yum-config-manager --enable remi-php74 && \
-    yum install -y sclo-subversion19 sclo-subversion19-mod_dav_svn sclo-subversion19-subversion-tools \
-        wget unzip which httpd24-httpd httpd24-mod_ssl perl-CPAN perl-Module-Build \
+    yum install -y cronie at httpd mod_dav_svn mod_ldap mod_php mod_ssl \
+        subversion subversion-tools wget unzip which perl-CPAN perl-Module-Build \
         perl-Net-SMTP-SSL perl-Net-SMTPS perl-HTML-Entities-Numbered perl-Pod-Usage  \
-        net-tools hostname inotify-tools supervisor php php-common php-cli php-fpm \
+        net-tools hostname inotify-tools php php-common php-cli php-fpm \
         php-json php-mysqlnd php-mysql php-pdo php-process php-json php-gd php-bcmath \
         php-ldap php-mbstring cyrus-sasl cyrus-sasl-lib cyrus-sasl-plain && \
     yum clean all && \
-    rm -rf /opt/rh/httpd24/root/var/www/html && \
-    ln -s /app /opt/rh/httpd24/root/var/www/html && \
     chown -R apache:apache /app && \
-    /usr/bin/cp -pf /etc/httpd/conf.d/* /opt/rh/httpd24/root/etc/httpd/conf.d/ && \
-    /usr/bin/cp -pf /etc/httpd/modules/libphp7* /opt/rh/httpd24/root/etc/httpd/modules/ && \
-    /usr/bin/cp -pf /etc/httpd/conf.modules.d/15-php.conf /opt/rh/httpd24/root/etc/httpd/conf.modules.d/ && \
+    rm -rf /var/www/html && \
+    ln -s /app /var/www/html && \
     chmod +x /bootstrap.sh
     # cpan -i SVN::Notify && \
     # cpan -i Net::SMTP::TLS
 
-ENTRYPOINT ["/bootstrap.sh"]
+CMD ["/bootstrap.sh"]

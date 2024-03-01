@@ -1,14 +1,7 @@
 #!/bin/bash
 
-set -e
-set -u
+source /etc/profile
 
-# Supervisord default params
-SUPERVISOR_PARAMS='-c /etc/supervisord.conf'
-
-
-# Create directories for supervisor's UNIX socket and logs (which might be missing
-# as container might start with /data mounted from another data-container).
 if [ ! -d "/home/svnadmin/rep" ];then
     mkdir -p /home/svnadmin/{crond,logs,rep,backup} /home/svnadmin/templete/initStruct/01/{trunk,tags,branches} /run/php-fpm
 fi
@@ -19,48 +12,28 @@ if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     touch /home/svnadmin/lock
 fi
 
-# Start saslauthd for LDAP authentication
-sed -i "s/SOCKETDIR=\/run\/saslauthd/SOCKETDIR=\/home\/svnadmin\/sasl\/ldap/" /etc/sysconfig/saslauthd
+chown -R apache:apache /home/svnadmin/
+
+/usr/sbin/php-fpm
+
+/usr/bin/svnserve --daemon --pid-file=/home/svnadmin/svnserve.pid -r '/home/svnadmin/rep/' --config-file '/home/svnadmin/svnserve.conf' --log-file '/home/svnadmin/logs/svnserve.log' --listen-port 3690 --listen-host 0.0.0.0
+
 spid=$(uuidgen)
+
 /usr/sbin/saslauthd -a 'ldap' -O "$spid" -O '/home/svnadmin/sasl/ldap/saslauthd.conf'
+
 ps aux | grep -v grep | grep "$spid" | awk 'NR==1' | awk '{print $2}' > '/home/svnadmin/sasl/saslauthd.pid'
 chmod 777 /home/svnadmin/sasl/saslauthd.pid
 
-chmod -R 711 /home/svnadmin/
-chown -R apache:apache /home/svnadmin
+/usr/sbin/crond
 
-# Execute some init scripts if exist
-if [ "$(ls /config/init/)" ]; then
-  for init in /config/init/*.sh; do
-    . $init
-  done
-fi
+/usr/sbin/atd
 
+/usr/bin/php /var/www/html/server/svnadmind.php start &
 
-# We have TTY, so probably an interactive container...
-if test -t 0; then
-  # Run supervisord detached...
-  supervisord $SUPERVISOR_PARAMS
-  
-  # Some command(s) has been passed to container? Execute them and exit.
-  # No commands provided? Run bash.
-  if [[ $@ ]]; then 
-    eval $@
-  else 
-    export PS1='[\u@\h : \w]\$ '
-    /bin/bash
-  fi
+rm -rf /run/httpd
+mkdir -p /run/httpd
+chown -R apache:apache /run/httpd
+/usr/sbin/httpd
 
-# Detached mode? Run supervisord in foreground, which will stay until container is stopped.
-else
-  # If some extra params were passed, execute them before.
-  # @TODO It is a bit confusing that the passed command runs *before* supervisord, 
-  #       while in interactive mode they run *after* supervisor.
-  #       Not sure about that, but maybe when any command is passed to container,
-  #       it should be executed *always* after supervisord? And when the command ends,
-  #       container exits as well.
-  if [[ $@ ]]; then 
-    eval $@
-  fi
-  supervisord -n $SUPERVISOR_PARAMS
-fi
+tail -f /home/svnadmin/logs/*.log

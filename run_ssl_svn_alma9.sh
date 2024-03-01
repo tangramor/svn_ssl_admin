@@ -7,4 +7,5 @@ docker run -d -it \
     -v /etc/localtime:/etc/localtime \
     -v ${PWD}/svnadmin:/home/svnadmin \
     --name svn \
+    --privileged \
     tangramor/svn_ssl_admin:alma9
