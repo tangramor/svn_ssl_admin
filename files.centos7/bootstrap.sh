@@ -3,21 +3,8 @@
 set -e
 set -u
 
-# Set subversion and httpd environment variables
-if [ `grep -c "/opt/rh/sclo-subversion19/enable" /root/.bashrc` -eq '0' ];then
-    echo ". /opt/rh/sclo-subversion19/enable" >> /root/.bashrc
-fi
-
-if [ `grep -c "/opt/rh/httpd24/enable" /root/.bashrc` -eq '0' ];then
-    echo ". /opt/rh/httpd24/enable" >> /root/.bashrc
-fi
-
-. /opt/rh/sclo-subversion19/enable
-. /opt/rh/httpd24/enable
-
 # Supervisord default params
 SUPERVISOR_PARAMS='-c /etc/supervisord.conf'
-
 
 # Create directories for supervisor's UNIX socket and logs (which might be missing
 # as container might start with /data mounted from another data-container).
@@ -27,7 +14,6 @@ fi
 
 if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     /usr/bin/cp -Rf /data.template/* /home/svnadmin/
-    /usr/bin/cp -f /data.template/config/bin.php /app/config/bin.php
 
     touch /home/svnadmin/lock
 fi
@@ -38,7 +24,6 @@ spid=$(uuidgen)
 ps aux | grep -v grep | grep "$spid" | awk 'NR==1' | awk '{print $2}' > '/home/svnadmin/sasl/saslauthd.pid'
 chmod 777 /home/svnadmin/sasl/saslauthd.pid
 
-chmod -R 711 /home/svnadmin/
 chown -R apache:apache /home/svnadmin
 
 # Execute some init scripts if exist
