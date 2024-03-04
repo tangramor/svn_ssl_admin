@@ -20,7 +20,7 @@ COPY --from=builder /app/SvnAdminV2.0/02.php/ /app/
 COPY --from=builder /app/SvnAdminV2.0/01.web/dist/* /app/
 COPY --from=builder /app/SvnAdminV2.0/03.cicd/svnadmin_docker/data/ /data.template/
 
-WORKDIR /app
+WORKDIR /var/www/html
 
 RUN localedef -c -i en_US -f UTF-8 C.UTF-8 && \
     echo 'LANG="C.UTF-8"' >> /etc/sysconfig/i18n && \
