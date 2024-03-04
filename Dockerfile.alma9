@@ -20,7 +20,7 @@ COPY --from=builder /app/SvnAdminV2.0/02.php/ /var/www/html/
 COPY --from=builder /app/SvnAdminV2.0/01.web/dist/* /var/www/html/
 COPY --from=builder /app/SvnAdminV2.0/03.cicd/svnadmin_docker/data/ /data.template/
 
-WORKDIR /app
+WORKDIR /var/www/html
 
 RUN dnf -y update && dnf install -y epel-release && \
     dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
