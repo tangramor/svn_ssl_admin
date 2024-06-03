@@ -19,6 +19,17 @@ if [[ -d "/data.template/" ]] && [[ ! -f "/home/svnadmin/lock" ]];then
     touch /home/svnadmin/lock
 fi
 
+if [[ ! -d "/home/svnadmin/config" ]] && [[ ! -f "/home/svnadmin/lockconfig" ]];then
+    /usr/bin/cp -Rf /var/www/html/config /home/svnadmin/
+
+    touch /home/svnadmin/lockconfig
+fi
+
+if [[ ! -d "/var/www/html/config.orig" ]];then
+    mv /var/www/html/config /var/www/html/config.orig
+    ln -s /home/svnadmin/config /var/www/html/config
+fi
+
 # Start saslauthd for LDAP authentication
 sed -i "s/SOCKETDIR=\/run\/saslauthd/SOCKETDIR=\/home\/svnadmin\/sasl\/ldap/" /etc/sysconfig/saslauthd
 spid=$(uuidgen)
