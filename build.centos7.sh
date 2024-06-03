@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker build -t tangramor/svn_ssl_admin:centos7 -f Dockerfile.centos7 .
+docker build --no-cache -t tangramor/svn_ssl_admin:centos7 -f Dockerfile.centos7 .

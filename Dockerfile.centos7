@@ -5,7 +5,7 @@ WORKDIR /app
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk add git && \
     npm config set registry https://registry.npmmirror.com/ && \
-    git clone https://github.com/tangramor/SvnAdminV2.0.git && \
+    git clone -b certKeyLogin https://github.com/tangramor/SvnAdminV2.0.git && \
     cd SvnAdminV2.0/01.web/ && \
     npm update && \
     npm run build && \

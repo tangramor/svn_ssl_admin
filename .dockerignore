@@ -1,2 +1,3 @@
-build.sh
-run_ssl_svn.sh
+build*.sh
+run_*.sh
+svnadmin
