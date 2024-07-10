@@ -5,7 +5,7 @@ WORKDIR /app
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
     apk add git && \
     npm config set registry https://registry.npmmirror.com/ && \
-    git clone -b certKeyLogin https://github.com/tangramor/SvnAdminV2.0.git && \
+    git clone -b dynamici18n https://github.com/tangramor/SvnAdminV2.0.git && \
     cd SvnAdminV2.0/01.web/ && \
     npm update && \
     npm run build && \
@@ -28,6 +28,11 @@ RUN localedef -c -i en_US -f UTF-8 C.UTF-8 && \
     echo 'export LANG="C.UTF-8"' >> /etc/profile && \
     echo 'export LC_ALL="C.UTF-8"' >> /etc/profile && \
     echo -e "[WandiscoSVN]\nname=Wandisco SVN Repo\nbaseurl=http://opensource.wandisco.com/centos/7/svn-1.14/RPMS/x86_64/\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/wandisco-svn.repo && \
+    sed -e "s|^mirrorlist=|#mirrorlist=|g" \
+        -e "s|^#baseurl=http://mirror.centos.org/centos/\$releasever|baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" \
+        -e "s|^#baseurl=http://mirror.centos.org/\$contentdir/\$releasever|baseurl=https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" \
+        -i.bak \
+        /etc/yum.repos.d/CentOS-*.repo && \
     yum install -y epel-release yum-utils && \
     rpm -Uvh https://mirrors.aliyun.com/remi/enterprise/remi-release-7.rpm && \
     yum-config-manager --enable remi-php74 && \
